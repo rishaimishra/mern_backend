@@ -45,7 +45,19 @@ const OrderSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     },
-    product: String
+    dateOrdered: {
+        type: Date,
+        default: Date.now
+    }
+})
+
+
+OrderSchema.virtual('id').get(function(){
+    return this._id.toHexString();
+});
+
+OrderSchema.set('toJSON', {
+    virtuals: true
 })
 
 exports.Order = mongoose.model('Order', OrderSchema);
