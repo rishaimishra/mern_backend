@@ -4,7 +4,7 @@ const {Order} = require('../models/order')
 const {OrderItem} = require('../models/order-item')
 
 router.get(`/`, async (req, res) => {
-    const orderList = await Order.find();
+    const orderList = await Order.find().populate('orderItems').populate('user');
 
     if (!orderList) {
         res.status(500).json({success:false})
@@ -12,8 +12,8 @@ router.get(`/`, async (req, res) => {
     res.send(orderList);
 })
 
-router.post(`/`, (req, res) => {
-    const orderItemsIds = req.body.orderItemsIds.map(async orderItem=>{
+router.post(`/`, async (req, res) => {
+    const orderItemsIds = Promise.all(req.body.orderItemsIds.map(async orderItem=>{
         let newOrderItem = new OrderItem({
             quantity: orderItem.quantity,
             product: orderItem.product
@@ -21,11 +21,14 @@ router.post(`/`, (req, res) => {
 
         newOrderItem = await newOrderItem.save();
 
+        // return newOrderItem._id.toString();
         return newOrderItem._id;
-    })
+    }))
+
+    const orderItemIdsResolved = await orderItemsIds;
 
     let order = new Order({
-        orderItems: orderItemsIds,
+        orderItems: orderItemIdsResolved,
         shippingAddress1: req.body.shippingAddress1,
         shippingAddress2: req.body.shippingAddress2,
         city: req.body.city,
