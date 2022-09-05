@@ -190,5 +190,37 @@ router.get('/get/featured/:count', async (req, res) =>{
     return res.status(200).json({products: products})
 })
 
+router.put('/gallery-images/:id',uploadOptions.array('images', 10), async (req, res)=>{
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        res.status(400).send('Invalid Product Id')
+    }
+
+    const files = req.files
+    let imagePaths = [];
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        
+
+    if (files) {
+        files.map(file=>{
+            imagePaths.push(`${basePath}${file.fileName}`);
+        })
+    }
+
+    let product = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+            images: imagePaths,
+        },
+        {new: true}
+    )
+
+    if (!product) {
+        return res.status(500).json({success:false, message: 'The product with given ID was not found'});
+    }
+
+    return res.status(200).json({product})
+
+})
+
 
 module.exports= router;
