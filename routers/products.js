@@ -202,7 +202,7 @@ router.put('/gallery-images/:id',uploadOptions.array('images', 10), async (req, 
 
     if (files) {
         files.map(file=>{
-            imagePaths.push(`${basePath}${file.fileName}`);
+            imagePaths.push(`${basePath}${file.filename}`);
         })
     }
 
