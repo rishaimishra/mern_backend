@@ -13,6 +13,19 @@ router.get(`/`, async (req, res) => {
     res.send(orderList);
 })
 
+router.get(`/get/userorders/:userid`, async (req, res) => {
+    const userorderList = await Order.find({user: req.params.userid}).populate({
+        path: 'orderItems', populate: {
+            path: 'product', populate: 'category'
+        }
+    }).sort({'dateOrdered': -1});
+
+    if (!userorderList) {
+        res.status(500).json({success:false})
+    }
+    res.send(userorderList);
+})
+
 router.get(`/:id`, async (req, res) => {
     const order = await Order
         .findById(req.params.id)

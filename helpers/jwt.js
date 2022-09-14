@@ -23,9 +23,7 @@ function authJwt(){
 //     if (!payload.isAdmin) {
 //         done();
 //     }
-
 //     done(null, true)
-
 // }
 
 module.exports = authJwt;
